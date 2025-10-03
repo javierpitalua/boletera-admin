@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useParams } from "wouter";
 import { ChevronLeft, Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -88,10 +89,20 @@ const mockPerformances = [
 ];
 
 export default function EventDetails() {
+  const { id } = useParams();
+  const [, setLocation] = useLocation();
   const [selectedZone, setSelectedZone] = useState<string>();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
+
+  const handleFindTickets = (performanceId: string) => {
+    setLocation(`/event/${id}/seats/${performanceId}`);
+  };
+
+  const handleBack = () => {
+    setLocation("/");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,6 +124,7 @@ export default function EventDetails() {
             <Button
               variant="ghost"
               className="mb-4 text-white hover:bg-white/20"
+              onClick={handleBack}
               data-testid="button-back"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
@@ -159,7 +171,7 @@ export default function EventDetails() {
           <TabsContent value="performances" className="space-y-6">
             <EventPerformanceList
               performances={mockPerformances}
-              onFindTickets={(id) => console.log("Find tickets for:", id)}
+              onFindTickets={handleFindTickets}
             />
           </TabsContent>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { HeroSection } from "@/components/HeroSection";
 import { FilterBar } from "@/components/FilterBar";
@@ -89,6 +90,7 @@ const mockCartItems = [
 ];
 
 export default function CustomerHome() {
+  const [, setLocation] = useLocation();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [cartItems, setCartItems] = useState(mockCartItems);
@@ -103,6 +105,10 @@ export default function CustomerHome() {
 
   const handleRemove = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
+  };
+
+  const handleViewEvent = (eventId: string) => {
+    setLocation(`/event/${eventId}`);
   };
 
   return (
@@ -137,7 +143,7 @@ export default function CustomerHome() {
             <EventCard
               key={event.id}
               {...event}
-              onViewDetails={(id) => console.log("View event:", id)}
+              onViewDetails={handleViewEvent}
             />
           ))}
         </div>

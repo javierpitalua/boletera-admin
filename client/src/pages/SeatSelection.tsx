@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useParams } from "wouter";
 import { ChevronLeft, Calendar, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomerHeader } from "@/components/CustomerHeader";
@@ -85,11 +86,17 @@ const mockZones = [
 ];
 
 export default function SeatSelection() {
+  const { eventId } = useParams();
+  const [, setLocation] = useLocation();
   const [selectedZone, setSelectedZone] = useState<string>();
   const [authOpen, setAuthOpen] = useState(false);
   const [ticketQuantity, setTicketQuantity] = useState(1);
 
   const selectedZoneData = mockZones.find((z) => z.id === selectedZone);
+
+  const handleBack = () => {
+    setLocation(`/event/${eventId}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,7 +107,7 @@ export default function SeatSelection() {
 
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
-          <Button variant="ghost" data-testid="button-back" className="mb-4">
+          <Button variant="ghost" onClick={handleBack} data-testid="button-back" className="mb-4">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Volver al evento
           </Button>

@@ -7,6 +7,7 @@ import { ZoneSelector } from "@/components/ZoneSelector";
 import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
+import { EventPerformanceList } from "@/components/EventPerformanceList";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 
 // todo: remove mock functionality
@@ -39,6 +40,50 @@ const mockProducts = [
     description: "Playera oficial del festival",
     price: 450,
     category: "merchandise" as const,
+  },
+];
+
+// todo: remove mock functionality
+const mockPerformances = [
+  {
+    id: "1",
+    date: "2024-11-15",
+    time: "8:00 PM",
+    city: "Ciudad de México",
+    state: "CDMX",
+    venue: "Estadio Nacional",
+  },
+  {
+    id: "2",
+    date: "2024-11-22",
+    time: "7:30 PM",
+    city: "Guadalajara",
+    state: "Jalisco",
+    venue: "Arena VFG",
+  },
+  {
+    id: "3",
+    date: "2024-11-29",
+    time: "9:00 PM",
+    city: "Monterrey",
+    state: "Nuevo León",
+    venue: "Arena Monterrey",
+  },
+  {
+    id: "4",
+    date: "2024-12-06",
+    time: "8:30 PM",
+    city: "Puebla",
+    state: "Puebla",
+    venue: "Estadio Cuauhtémoc",
+  },
+  {
+    id: "5",
+    date: "2024-12-13",
+    time: "8:00 PM",
+    city: "Tijuana",
+    state: "Baja California",
+    venue: "Auditorio Municipal",
   },
 ];
 
@@ -95,8 +140,11 @@ export default function EventDetails() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="performances" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="performances" data-testid="tab-performances">
+              Fechas y Lugares
+            </TabsTrigger>
             <TabsTrigger value="overview" data-testid="tab-overview">
               Descripción
             </TabsTrigger>
@@ -107,6 +155,13 @@ export default function EventDetails() {
               Productos Adicionales
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="performances" className="space-y-6">
+            <EventPerformanceList
+              performances={mockPerformances}
+              onFindTickets={(id) => console.log("Find tickets for:", id)}
+            />
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-6">
             <div>

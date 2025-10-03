@@ -1,11 +1,18 @@
+import { useState } from "react";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { QRTicket } from "@/components/QRTicket";
+import { AuthDialog } from "@/components/AuthDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function MyTickets() {
+  const [authOpen, setAuthOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
-      <CustomerHeader cartItemCount={0} />
+      <CustomerHeader
+        cartItemCount={0}
+        onUserClick={() => setAuthOpen(true)}
+      />
 
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold font-serif mb-6">Mis Boletos</h1>
@@ -41,6 +48,8 @@ export default function MyTickets() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
 import { CartSidebar } from "@/components/CartSidebar";
+import { AuthDialog } from "@/components/AuthDialog";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 import theaterImage from "@assets/generated_images/Theater_venue_interior_9daf57bf.png";
 import festivalImage from "@assets/generated_images/Festival_outdoor_event_02b067fb.png";
@@ -89,6 +90,7 @@ const mockCartItems = [
 
 export default function CustomerHome() {
   const [cartOpen, setCartOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [cartItems, setCartItems] = useState(mockCartItems);
 
   const handleQuantityChange = (id: string, quantity: number) => {
@@ -109,6 +111,7 @@ export default function CustomerHome() {
         cartItemCount={cartItems.length}
         onSearchChange={(value) => console.log("Search:", value)}
         onCartClick={() => setCartOpen(true)}
+        onUserClick={() => setAuthOpen(true)}
       />
 
       <HeroSection onSearch={(query) => console.log("Hero search:", query)} />
@@ -148,6 +151,8 @@ export default function CustomerHome() {
         onRemove={handleRemove}
         onCheckout={() => console.log("Checkout")}
       />
+
+      <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }

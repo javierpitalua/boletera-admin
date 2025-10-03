@@ -6,6 +6,7 @@ import { CustomerHeader } from "@/components/CustomerHeader";
 import { ZoneSelector } from "@/components/ZoneSelector";
 import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
+import { AuthDialog } from "@/components/AuthDialog";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 
 // todo: remove mock functionality
@@ -44,6 +45,7 @@ const mockProducts = [
 export default function EventDetails() {
   const [selectedZone, setSelectedZone] = useState<string>();
   const [cartOpen, setCartOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
 
   return (
@@ -51,6 +53,7 @@ export default function EventDetails() {
       <CustomerHeader
         cartItemCount={2}
         onCartClick={() => setCartOpen(true)}
+        onUserClick={() => setAuthOpen(true)}
       />
 
       <div className="relative h-80 overflow-hidden">
@@ -171,6 +174,8 @@ export default function EventDetails() {
         onClose={() => setCartOpen(false)}
         onCheckout={() => console.log("Checkout")}
       />
+
+      <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }

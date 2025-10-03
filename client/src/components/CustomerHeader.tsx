@@ -8,9 +8,10 @@ interface CustomerHeaderProps {
   cartItemCount?: number;
   onSearchChange?: (value: string) => void;
   onCartClick?: () => void;
+  onUserClick?: () => void;
 }
 
-export function CustomerHeader({ cartItemCount = 0, onSearchChange, onCartClick }: CustomerHeaderProps) {
+export function CustomerHeader({ cartItemCount = 0, onSearchChange, onCartClick, onUserClick }: CustomerHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -52,7 +53,7 @@ export function CustomerHeader({ cartItemCount = 0, onSearchChange, onCartClick 
                 </Badge>
               )}
             </Button>
-            <Button variant="ghost" size="icon" data-testid="button-user">
+            <Button variant="ghost" size="icon" onClick={onUserClick} data-testid="button-user">
               <User className="h-5 w-5" />
             </Button>
             <ThemeToggle />

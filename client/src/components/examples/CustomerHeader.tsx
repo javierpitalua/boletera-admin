@@ -8,6 +8,7 @@ export default function CustomerHeaderExample() {
         cartItemCount={3}
         onSearchChange={(value) => console.log("Search:", value)}
         onCartClick={() => console.log("Cart clicked")}
+        onUserClick={() => console.log("User clicked")}
       />
     </ThemeProvider>
   );

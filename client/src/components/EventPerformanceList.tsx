@@ -37,7 +37,7 @@ export function EventPerformanceList({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold font-serif mb-2">Fechas y Lugares</h2>
+        <h2 className="text-2xl font-bold mb-2">Fechas y Lugares</h2>
         <p className="text-muted-foreground">
           Selecciona la fecha y lugar de tu preferencia
         </p>

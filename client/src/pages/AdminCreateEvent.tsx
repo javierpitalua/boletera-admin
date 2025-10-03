@@ -17,7 +17,7 @@ export default function AdminCreateEvent() {
                 <ChevronLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold font-serif">Crear Evento</h1>
+                <h1 className="text-2xl font-bold">Crear Evento</h1>
                 <p className="text-sm text-muted-foreground">
                   Completa la información del nuevo evento
                 </p>

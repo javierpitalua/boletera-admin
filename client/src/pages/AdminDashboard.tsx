@@ -73,7 +73,7 @@ export default function AdminDashboard() {
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
           <div className="flex items-center justify-between p-4">
             <div>
-              <h1 className="text-2xl font-bold font-serif">Dashboard</h1>
+              <h1 className="text-2xl font-bold">Dashboard</h1>
               <p className="text-sm text-muted-foreground">
                 Vista general de tu plataforma
               </p>

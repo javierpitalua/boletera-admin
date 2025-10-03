@@ -32,7 +32,7 @@ export function QRTicket({
       <div className="bg-gradient-to-br from-primary to-primary/80 p-6 text-primary-foreground">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-xl font-serif font-bold mb-1" data-testid="text-ticket-event">
+            <h2 className="text-xl font-bold mb-1" data-testid="text-ticket-event">
               {eventName}
             </h2>
             <Badge variant="secondary" className="bg-white/20 text-white" data-testid="badge-ticket-zone">

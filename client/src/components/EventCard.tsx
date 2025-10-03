@@ -41,7 +41,7 @@ export function EventCard({
           </Badge>
         )}
         <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="text-lg font-serif font-semibold text-white line-clamp-2 mb-1" data-testid={`text-title-${id}`}>
+          <h3 className="text-lg font-semibold text-white line-clamp-2 mb-1" data-testid={`text-title-${id}`}>
             {title}
           </h3>
         </div>

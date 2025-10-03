@@ -113,7 +113,7 @@ export default function SeatSelection() {
           </Button>
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold font-serif" data-testid="text-event-title">
+            <h1 className="text-3xl font-bold" data-testid="text-event-title">
               Festival de Rock en Vivo 2024
             </h1>
             <div className="flex flex-wrap gap-4 text-muted-foreground">

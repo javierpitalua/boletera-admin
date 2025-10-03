@@ -17,7 +17,7 @@ export function CustomerHeader({ cartItemCount = 0, onSearchChange, onCartClick,
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-primary font-serif" data-testid="text-logo">
+            <h1 className="text-xl font-bold text-primary" data-testid="text-logo">
               EventTicket
             </h1>
           </div>

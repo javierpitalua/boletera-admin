@@ -130,7 +130,7 @@ export default function CustomerHome() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold font-serif mb-2">
+          <h2 className="text-2xl font-bold mb-2">
             Próximos Eventos
           </h2>
           <p className="text-muted-foreground">

@@ -28,7 +28,7 @@ export function AdminSidebar({ currentPage = "dashboard", onNavigate }: AdminSid
     >
       <div className="flex items-center justify-between p-4 border-b">
         {!isCollapsed && (
-          <h1 className="text-lg font-bold font-serif text-sidebar-primary" data-testid="text-admin-logo">
+          <h1 className="text-lg font-bold text-sidebar-primary" data-testid="text-admin-logo">
             EventTicket Admin
           </h1>
         )}

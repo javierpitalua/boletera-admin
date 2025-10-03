@@ -130,7 +130,7 @@ export default function EventDetails() {
               <ChevronLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>
-            <h1 className="text-4xl font-bold text-white font-serif mb-2" data-testid="text-event-title">
+            <h1 className="text-4xl font-bold text-white mb-2" data-testid="text-event-title">
               Festival de Rock en Vivo 2024
             </h1>
             <div className="flex flex-wrap gap-4 text-white/90">

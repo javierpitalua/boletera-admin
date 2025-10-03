@@ -20,7 +20,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 font-serif" data-testid="text-hero-title">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4" data-testid="text-hero-title">
           Vive la Experiencia
         </h1>
         <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto" data-testid="text-hero-subtitle">

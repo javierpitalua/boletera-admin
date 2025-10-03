@@ -65,7 +65,7 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
         )}
 
         <DialogHeader className="pt-8">
-          <DialogTitle className="text-2xl font-serif text-center">
+          <DialogTitle className="text-2xl text-center">
             {view === "login" && "Iniciar Sesión"}
             {view === "register" && "Crear Cuenta"}
             {view === "forgot" && "Recuperar Contraseña"}

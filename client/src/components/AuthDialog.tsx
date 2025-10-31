@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Mail, Lock, User, Phone, ArrowLeft } from "lucide-react";
+import { useLocation } from "wouter";
+import { Mail, Lock, User, Phone, ArrowLeft, Shield } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -18,7 +20,9 @@ interface AuthDialogProps {
 type AuthView = "login" | "register" | "forgot";
 
 export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
+  const [, setLocation] = useLocation();
   const [view, setView] = useState<AuthView>("login");
+  const [isCoordinator, setIsCoordinator] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,8 +33,15 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Auth submit:", view, formData);
-    onClose();
+    console.log("Auth submit:", view, formData, "isCoordinator:", isCoordinator);
+    
+    // Simular login - si es coordinador, redirigir al dashboard de coordinador
+    if (view === "login" && isCoordinator) {
+      setLocation('/coordinator');
+      onClose();
+    } else {
+      onClose();
+    }
   };
 
   const resetForm = () => {
@@ -75,6 +86,35 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {view === "login" && (
             <>
+              {/* Selector de tipo de usuario */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => setIsCoordinator(false)}
+                  className={`py-2 px-4 rounded-md font-medium transition-colors ${
+                    !isCoordinator
+                      ? "bg-background shadow-sm"
+                      : "hover:bg-background/50"
+                  }`}
+                  data-testid="button-user-type-customer"
+                >
+                  Cliente
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCoordinator(true)}
+                  className={`py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                    isCoordinator
+                      ? "bg-background shadow-sm"
+                      : "hover:bg-background/50"
+                  }`}
+                  data-testid="button-user-type-coordinator"
+                >
+                  <Shield className="h-4 w-4" />
+                  Coordinador
+                </button>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="login-email">Correo Electrónico</Label>
                 <div className="relative">
@@ -111,6 +151,17 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
                 </div>
               </div>
 
+              {isCoordinator && (
+                <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Shield className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      Estás iniciando sesión como coordinador de eventos. Tendrás acceso al panel de gestión y creación de eventos.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -123,7 +174,7 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
               </div>
 
               <Button type="submit" className="w-full" data-testid="button-login">
-                Iniciar Sesión
+                {isCoordinator ? "Acceder al Panel" : "Iniciar Sesión"}
               </Button>
 
               <div className="text-center text-sm text-muted-foreground">

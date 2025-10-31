@@ -141,8 +141,8 @@ export default function CustomerHome() {
 
   const handleCheckout = () => {
     console.log("Proceeding to checkout with items:", cartItems);
-    // TODO: Implement checkout navigation
-    alert("Navegación a la pantalla de pago (por implementar)");
+    setLocation('/checkout');
+    setCartOpen(false);
   };
 
   const handleViewEvent = (eventId: string) => {

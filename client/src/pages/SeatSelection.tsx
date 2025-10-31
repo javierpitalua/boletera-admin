@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { ChevronLeft, Calendar, MapPin } from "lucide-react";
+import { ChevronLeft, Calendar, MapPin, ShoppingCart, Minus, Plus, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { AuthDialog } from "@/components/AuthDialog";
 import { VenueZoneMap } from "@/components/VenueZoneMap";
 import { ZonePriceList } from "@/components/ZonePriceList";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 // todo: remove mock functionality
 const mockZones = [
@@ -18,6 +19,7 @@ const mockZones = [
     color: "#9b59b6",
     available: 85,
     capacity: 100,
+    hasSeats: true,
     coordinates: { x: 250, y: 150, width: 300, height: 100 },
   },
   {
@@ -27,6 +29,7 @@ const mockZones = [
     color: "#3498db",
     available: 120,
     capacity: 150,
+    hasSeats: true,
     coordinates: { x: 150, y: 270, width: 200, height: 120 },
   },
   {
@@ -36,6 +39,7 @@ const mockZones = [
     color: "#3498db",
     available: 95,
     capacity: 150,
+    hasSeats: true,
     coordinates: { x: 450, y: 270, width: 200, height: 120 },
   },
   {
@@ -45,6 +49,7 @@ const mockZones = [
     color: "#27ae60",
     available: 200,
     capacity: 250,
+    hasSeats: false,
     coordinates: { x: 50, y: 410, width: 180, height: 140 },
   },
   {
@@ -54,6 +59,7 @@ const mockZones = [
     color: "#27ae60",
     available: 180,
     capacity: 300,
+    hasSeats: false,
     coordinates: { x: 250, y: 410, width: 300, height: 140 },
   },
   {
@@ -63,6 +69,7 @@ const mockZones = [
     color: "#27ae60",
     available: 150,
     capacity: 250,
+    hasSeats: false,
     coordinates: { x: 570, y: 410, width: 180, height: 140 },
   },
   {
@@ -72,6 +79,7 @@ const mockZones = [
     color: "#e74c3c",
     available: 5,
     capacity: 20,
+    hasSeats: true,
     coordinates: { x: 50, y: 270, width: 80, height: 80 },
   },
   {
@@ -81,22 +89,114 @@ const mockZones = [
     color: "#e74c3c",
     available: 0,
     capacity: 20,
+    hasSeats: true,
     coordinates: { x: 670, y: 270, width: 80, height: 80 },
+  },
+];
+
+const mockAdditionalItems = [
+  {
+    id: "combo-food",
+    name: "Combo Familiar",
+    category: "Comida",
+    price: 350,
+    description: "Palomitas grandes + 2 refrescos + nachos",
+  },
+  {
+    id: "beer",
+    name: "Cerveza Premium",
+    category: "Bebidas",
+    price: 85,
+    description: "Cerveza artesanal 355ml",
+  },
+  {
+    id: "soda",
+    name: "Refresco Grande",
+    category: "Bebidas",
+    price: 45,
+    description: "600ml",
+  },
+  {
+    id: "tshirt",
+    name: "Playera del Evento",
+    category: "Mercancía",
+    price: 450,
+    description: "Talla M, L, XL disponibles",
+  },
+  {
+    id: "poster",
+    name: "Póster Oficial",
+    category: "Mercancía",
+    price: 200,
+    description: "45x60cm impresión premium",
   },
 ];
 
 export default function SeatSelection() {
   const { eventId } = useParams();
   const [, setLocation] = useLocation();
-  const [selectedZone, setSelectedZone] = useState<string>();
   const [authOpen, setAuthOpen] = useState(false);
-  const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [zoneTickets, setZoneTickets] = useState<{ [key: string]: number }>({});
+  const [additionalItems, setAdditionalItems] = useState<{ [key: string]: number }>({});
+  
+  const MAX_TICKETS = 8;
 
-  const selectedZoneData = mockZones.find((z) => z.id === selectedZone);
+  const totalTickets = Object.values(zoneTickets).reduce((sum, count) => sum + count, 0);
+
+  const handleTicketChange = (zoneId: string, quantity: number) => {
+    setZoneTickets(prev => {
+      const newTickets = { ...prev };
+      if (quantity === 0) {
+        delete newTickets[zoneId];
+      } else {
+        newTickets[zoneId] = quantity;
+      }
+      return newTickets;
+    });
+  };
+
+  const handleItemChange = (itemId: string, change: number) => {
+    setAdditionalItems(prev => {
+      const current = prev[itemId] || 0;
+      const newValue = Math.max(0, current + change);
+      const newItems = { ...prev };
+      if (newValue === 0) {
+        delete newItems[itemId];
+      } else {
+        newItems[itemId] = newValue;
+      }
+      return newItems;
+    });
+  };
+
+  const calculateTotal = () => {
+    const ticketsTotal = Object.entries(zoneTickets).reduce((sum, [zoneId, count]) => {
+      const zone = mockZones.find(z => z.id === zoneId);
+      return sum + (zone ? zone.price * count : 0);
+    }, 0);
+
+    const itemsTotal = Object.entries(additionalItems).reduce((sum, [itemId, count]) => {
+      const item = mockAdditionalItems.find(i => i.id === itemId);
+      return sum + (item ? item.price * count : 0);
+    }, 0);
+
+    return ticketsTotal + itemsTotal;
+  };
 
   const handleBack = () => {
     setLocation(`/event/${eventId}`);
   };
+
+  const handleAddToCart = () => {
+    console.log("Adding to cart:", { zoneTickets, additionalItems });
+    // TODO: Add to cart logic
+  };
+
+  const groupedItems = mockAdditionalItems.reduce((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
+    acc[item.category].push(item);
+    return acc;
+  }, {} as { [key: string]: typeof mockAdditionalItems });
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,54 +230,177 @@ export default function SeatSelection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Mapa del Recinto</h2>
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-1">Mapa del Recinto</h2>
+                <p className="text-sm text-muted-foreground">
+                  Visualiza las zonas disponibles en el mapa
+                </p>
+              </div>
               <VenueZoneMap
                 zones={mockZones}
-                selectedZone={selectedZone}
-                onZoneSelect={setSelectedZone}
+                selectedZone={undefined}
+                onZoneSelect={() => {}}
               />
-            </div>
+            </Card>
 
-            {selectedZoneData && (
-              <div className="bg-card border rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-semibold">Resumen de Selección</h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="quantity">Cantidad de Boletos</Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      min="1"
-                      max={selectedZoneData.available}
-                      value={ticketQuantity}
-                      onChange={(e) => setTicketQuantity(parseInt(e.target.value) || 1)}
-                      data-testid="input-ticket-quantity"
-                    />
+            <Card className="p-6">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-1">Artículos Adicionales</h2>
+                <p className="text-sm text-muted-foreground">
+                  Mejora tu experiencia con comida, bebidas y mercancía oficial
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {Object.entries(groupedItems).map(([category, items]) => (
+                  <div key={category}>
+                    <h3 className="font-semibold mb-3 text-sm uppercase text-muted-foreground">
+                      {category}
+                    </h3>
+                    <div className="space-y-3">
+                      {items.map((item) => {
+                        const quantity = additionalItems[item.id] || 0;
+                        return (
+                          <div
+                            key={item.id}
+                            className={`flex items-center justify-between p-4 rounded-lg border ${
+                              quantity > 0 ? "border-primary bg-primary/5" : "border-border"
+                            }`}
+                            data-testid={`item-card-${item.id}`}
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold">{item.name}</h4>
+                                {quantity > 0 && (
+                                  <Badge variant="default" className="text-xs">
+                                    {quantity}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {item.description}
+                              </p>
+                              <p className="text-lg font-bold text-primary">
+                                ${item.price.toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleItemChange(item.id, -1)}
+                                disabled={quantity === 0}
+                                data-testid={`button-decrease-item-${item.id}`}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <div className="w-12 text-center">
+                                <span className="text-lg font-semibold" data-testid={`text-quantity-item-${item.id}`}>
+                                  {quantity}
+                                </span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleItemChange(item.id, 1)}
+                                data-testid={`button-increase-item-${item.id}`}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-end">
-                    <p className="text-sm text-muted-foreground mb-1">Total</p>
-                    <p className="text-2xl font-bold text-primary">
-                      ${(selectedZoneData.price * ticketQuantity).toLocaleString()}
-                    </p>
-                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-1 space-y-6">
+            <ZonePriceList
+              zones={mockZones}
+              zoneTickets={zoneTickets}
+              onTicketChange={handleTicketChange}
+              maxTickets={MAX_TICKETS}
+              totalTickets={totalTickets}
+            />
+
+            <Card className="p-6 sticky top-20">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Resumen</h3>
+                  <Badge variant="outline" className="gap-1">
+                    <Ticket className="h-3 w-3" />
+                    {totalTickets} / {MAX_TICKETS}
+                  </Badge>
                 </div>
 
-                <Button className="w-full" size="lg" data-testid="button-add-to-cart">
+                <Separator />
+
+                {totalTickets > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-muted-foreground">Boletos</p>
+                    {Object.entries(zoneTickets).map(([zoneId, count]) => {
+                      const zone = mockZones.find(z => z.id === zoneId);
+                      if (!zone) return null;
+                      return (
+                        <div key={zoneId} className="flex justify-between text-sm">
+                          <span>{zone.name} × {count}</span>
+                          <span className="font-semibold">
+                            ${(zone.price * count).toLocaleString()}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {Object.keys(additionalItems).length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-muted-foreground">Artículos Adicionales</p>
+                      {Object.entries(additionalItems).map(([itemId, count]) => {
+                        const item = mockAdditionalItems.find(i => i.id === itemId);
+                        if (!item) return null;
+                        return (
+                          <div key={itemId} className="flex justify-between text-sm">
+                            <span>{item.name} × {count}</span>
+                            <span className="font-semibold">
+                              ${(item.price * count).toLocaleString()}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                <Separator />
+
+                <div className="flex justify-between items-baseline">
+                  <span className="text-lg font-semibold">Total</span>
+                  <span className="text-2xl font-bold text-primary">
+                    ${calculateTotal().toLocaleString()}
+                  </span>
+                </div>
+
+                <Button
+                  className="w-full gap-2"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={totalTickets === 0}
+                  data-testid="button-add-to-cart"
+                >
+                  <ShoppingCart className="h-4 w-4" />
                   Agregar al Carrito
                 </Button>
               </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-1">
-            <ZonePriceList
-              zones={mockZones}
-              selectedZone={selectedZone}
-              onZoneSelect={setSelectedZone}
-            />
+            </Card>
           </div>
         </div>
       </div>

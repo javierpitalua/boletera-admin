@@ -86,6 +86,34 @@ const mockCartItems = [
     price: 2500,
     quantity: 2,
     image: concertImage,
+    type: 'ticket' as const,
+  },
+  {
+    id: "2",
+    eventName: "Festival de Rock en Vivo 2024",
+    zoneName: "General Centro",
+    price: 850,
+    quantity: 3,
+    image: concertImage,
+    type: 'ticket' as const,
+  },
+  {
+    id: "item-1",
+    eventName: "Festival de Rock en Vivo 2024",
+    zoneName: "Combo Familiar",
+    itemName: "Combo Familiar",
+    price: 350,
+    quantity: 1,
+    type: 'item' as const,
+  },
+  {
+    id: "item-2",
+    eventName: "Festival de Rock en Vivo 2024",
+    zoneName: "Cerveza Premium",
+    itemName: "Cerveza Premium",
+    price: 85,
+    quantity: 2,
+    type: 'item' as const,
   },
 ];
 
@@ -105,6 +133,16 @@ export default function CustomerHome() {
 
   const handleRemove = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
+  };
+
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
+  const handleCheckout = () => {
+    console.log("Proceeding to checkout with items:", cartItems);
+    // TODO: Implement checkout navigation
+    alert("Navegación a la pantalla de pago (por implementar)");
   };
 
   const handleViewEvent = (eventId: string) => {
@@ -155,7 +193,8 @@ export default function CustomerHome() {
         onClose={() => setCartOpen(false)}
         onQuantityChange={handleQuantityChange}
         onRemove={handleRemove}
-        onCheckout={() => console.log("Checkout")}
+        onClearCart={handleClearCart}
+        onCheckout={handleCheckout}
       />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />

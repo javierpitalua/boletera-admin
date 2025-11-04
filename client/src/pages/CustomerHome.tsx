@@ -8,6 +8,7 @@ import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 import theaterImage from "@assets/generated_images/Theater_venue_interior_9daf57bf.png";
 import festivalImage from "@assets/generated_images/Festival_outdoor_event_02b067fb.png";
@@ -122,28 +123,12 @@ const mockCartItems = [
 export default function CustomerHome() {
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
+  const { items, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const [cartItems, setCartItems] = useState(mockCartItems);
-
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleRemove = (id: string) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
 
   const handleCheckout = () => {
-    console.log("Proceeding to checkout with items:", cartItems);
+    console.log("Proceeding to checkout with items:", items);
     setLocation('/checkout');
     setCartOpen(false);
   };
@@ -155,7 +140,7 @@ export default function CustomerHome() {
   return (
     <div className="min-h-screen bg-background">
       <CustomerHeader
-        cartItemCount={cartItems.length}
+        cartItemCount={itemCount}
         onSearchChange={(value) => console.log("Search:", value)}
         onCartClick={() => setCartOpen(true)}
         onUserClick={() => setAuthOpen(true)}
@@ -192,11 +177,11 @@ export default function CustomerHome() {
 
       <CartSidebar
         isOpen={cartOpen}
-        items={isAuthenticated ? cartItems : []}
+        items={isAuthenticated ? items : []}
         onClose={() => setCartOpen(false)}
-        onQuantityChange={handleQuantityChange}
-        onRemove={handleRemove}
-        onClearCart={handleClearCart}
+        onQuantityChange={updateQuantity}
+        onRemove={removeItem}
+        onClearCart={clearCart}
         onCheckout={handleCheckout}
         onLoginClick={() => setAuthOpen(true)}
       />

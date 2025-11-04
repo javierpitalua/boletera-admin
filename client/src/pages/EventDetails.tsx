@@ -11,6 +11,8 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { EventPerformanceList } from "@/components/EventPerformanceList";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 
@@ -95,6 +97,8 @@ export default function EventDetails() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
+  const { addItem, itemCount } = useCart();
+  const { toast } = useToast();
   const [selectedZone, setSelectedZone] = useState<string>();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -116,7 +120,28 @@ export default function EventDetails() {
       return;
     }
     
+    const previousQuantity = productQuantities[productId] || 0;
     setProductQuantities({ ...productQuantities, [productId]: quantity });
+    
+    if (quantity > previousQuantity && quantity > 0) {
+      const product = mockProducts.find(p => p.id === productId);
+      if (product) {
+        addItem({
+          id: `item-${productId}-${Date.now()}`,
+          eventName: "Festival de Rock en Vivo 2024",
+          zoneName: product.name,
+          itemName: product.name,
+          price: product.price,
+          quantity: quantity - previousQuantity,
+          type: 'item',
+        });
+        
+        toast({
+          title: "Agregado al carrito",
+          description: `${product.name} agregado exitosamente`,
+        });
+      }
+    }
   };
 
   const handleAddToCart = () => {
@@ -126,13 +151,32 @@ export default function EventDetails() {
       return;
     }
     
-    console.log("Adding to cart:", selectedZone);
+    if (selectedZone) {
+      const zone = mockZones.find(z => z.id === selectedZone);
+      if (zone) {
+        addItem({
+          id: `ticket-${selectedZone}-${Date.now()}`,
+          eventName: "Festival de Rock en Vivo 2024",
+          zoneName: zone.name,
+          price: zone.price,
+          quantity: 1,
+          type: 'ticket',
+        });
+        
+        toast({
+          title: "Agregado al carrito",
+          description: `Boleto ${zone.name} agregado exitosamente`,
+        });
+        
+        setSelectedZone(undefined);
+      }
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <CustomerHeader
-        cartItemCount={2}
+        cartItemCount={itemCount}
         onCartClick={() => setCartOpen(true)}
         onUserClick={() => setAuthOpen(true)}
       />
@@ -275,9 +319,9 @@ export default function EventDetails() {
 
       <CartSidebar
         isOpen={cartOpen}
-        items={[]}
+        items={isAuthenticated ? [] : []}
         onClose={() => setCartOpen(false)}
-        onCheckout={() => console.log("Checkout")}
+        onCheckout={() => setLocation('/checkout')}
         onLoginClick={() => setAuthOpen(true)}
       />
 

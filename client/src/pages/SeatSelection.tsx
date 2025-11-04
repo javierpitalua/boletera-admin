@@ -11,6 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // todo: remove mock functionality
@@ -139,6 +141,8 @@ export default function SeatSelection() {
   const { eventId } = useParams();
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
+  const { addItem, itemCount } = useCart();
+  const { toast } = useToast();
   const [authOpen, setAuthOpen] = useState(false);
   const [zoneTickets, setZoneTickets] = useState<{ [key: string]: number }>({});
   const [additionalItems, setAdditionalItems] = useState<{ [key: string]: number }>({});
@@ -205,8 +209,46 @@ export default function SeatSelection() {
   };
 
   const handleAddToCart = () => {
-    console.log("Adding to cart:", { zoneTickets, additionalItems });
-    // TODO: Add to cart logic
+    Object.entries(zoneTickets).forEach(([zoneId, quantity]) => {
+      const zone = mockZones.find(z => z.id === zoneId);
+      if (zone) {
+        addItem({
+          id: `ticket-${zoneId}-${Date.now()}`,
+          eventName: "Festival de Rock en Vivo 2024",
+          zoneName: zone.name,
+          price: zone.price,
+          quantity,
+          type: 'ticket',
+        });
+      }
+    });
+
+    Object.entries(additionalItems).forEach(([itemId, quantity]) => {
+      const item = mockAdditionalItems.find(i => i.id === itemId);
+      if (item) {
+        addItem({
+          id: `item-${itemId}-${Date.now()}`,
+          eventName: "Festival de Rock en Vivo 2024",
+          zoneName: item.name,
+          itemName: item.name,
+          price: item.price,
+          quantity,
+          type: 'item',
+        });
+      }
+    });
+
+    toast({
+      title: "Agregado al carrito",
+      description: `${totalTickets} boleto(s) y ${Object.keys(additionalItems).length} artículo(s) agregados`,
+    });
+
+    setZoneTickets({});
+    setAdditionalItems({});
+    
+    setTimeout(() => {
+      setLocation(`/event/${eventId}`);
+    }, 500);
   };
 
   const groupedItems = mockAdditionalItems.reduce((acc, item) => {
@@ -218,7 +260,7 @@ export default function SeatSelection() {
   return (
     <div className="min-h-screen bg-background">
       <CustomerHeader
-        cartItemCount={0}
+        cartItemCount={itemCount}
         onUserClick={() => setAuthOpen(true)}
       />
 

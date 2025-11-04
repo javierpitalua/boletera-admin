@@ -6,6 +6,7 @@ import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
+import { useAuth } from "@/contexts/AuthContext";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 import theaterImage from "@assets/generated_images/Theater_venue_interior_9daf57bf.png";
 import festivalImage from "@assets/generated_images/Festival_outdoor_event_02b067fb.png";
@@ -119,6 +120,7 @@ const mockCartItems = [
 
 export default function CustomerHome() {
   const [, setLocation] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [cartItems, setCartItems] = useState(mockCartItems);
@@ -189,12 +191,13 @@ export default function CustomerHome() {
 
       <CartSidebar
         isOpen={cartOpen}
-        items={cartItems}
+        items={isAuthenticated ? cartItems : []}
         onClose={() => setCartOpen(false)}
         onQuantityChange={handleQuantityChange}
         onRemove={handleRemove}
         onClearCart={handleClearCart}
         onCheckout={handleCheckout}
+        onLoginClick={() => setAuthOpen(true)}
       />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />

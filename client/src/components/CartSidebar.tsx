@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, ShoppingBag, Tag, Ticket, Trash2, AlertCircle } from "lucide-react";
+import { X, ShoppingBag, Tag, Ticket, Trash2, AlertCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CartItemData {
   id: string;
@@ -28,6 +29,7 @@ interface CartSidebarProps {
   onRemove?: (id: string) => void;
   onCheckout?: () => void;
   onClearCart?: () => void;
+  onLoginClick?: () => void;
 }
 
 export function CartSidebar({
@@ -38,7 +40,9 @@ export function CartSidebar({
   onRemove,
   onCheckout,
   onClearCart,
+  onLoginClick,
 }: CartSidebarProps) {
+  const { isAuthenticated } = useAuth();
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
@@ -165,7 +169,32 @@ export function CartSidebar({
             )}
           </div>
 
-          {items.length === 0 ? (
+          {!isAuthenticated ? (
+            <div className="flex-1 flex items-center justify-center p-8 text-center">
+              <div className="max-w-xs space-y-4">
+                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+                  <LogIn className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-lg">Inicia sesión para continuar</h3>
+                  <p className="text-sm text-muted-foreground" data-testid="text-login-required">
+                    Inicia sesión para agregar boletos o artículos a tu carrito
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => {
+                    onClose();
+                    onLoginClick?.();
+                  }}
+                  className="w-full"
+                  data-testid="button-cart-login"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Iniciar Sesión
+                </Button>
+              </div>
+            </div>
+          ) : items.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-8 text-center">
               <div>
                 <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />

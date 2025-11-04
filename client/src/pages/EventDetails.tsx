@@ -277,6 +277,7 @@ export default function EventDetails() {
         items={[]}
         onClose={() => setCartOpen(false)}
         onCheckout={() => console.log("Checkout")}
+        onLoginClick={() => setAuthOpen(true)}
       />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />

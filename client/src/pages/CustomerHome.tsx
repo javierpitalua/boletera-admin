@@ -6,6 +6,7 @@ import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
+import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 import theaterImage from "@assets/generated_images/Theater_venue_interior_9daf57bf.png";
@@ -201,6 +202,8 @@ export default function CustomerHome() {
       />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      
+      <Footer />
     </div>
   );
 }

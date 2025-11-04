@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
 import { EventPerformanceList } from "@/components/EventPerformanceList";
+import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
@@ -281,6 +282,8 @@ export default function EventDetails() {
       />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      
+      <Footer />
     </div>
   );
 }

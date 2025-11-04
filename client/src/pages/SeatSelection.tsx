@@ -4,6 +4,7 @@ import { ChevronLeft, Calendar, MapPin, ShoppingCart, Minus, Plus, Ticket, Alert
 import { Button } from "@/components/ui/button";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { AuthDialog } from "@/components/AuthDialog";
+import { Footer } from "@/components/Footer";
 import { VenueZoneMap } from "@/components/VenueZoneMap";
 import { ZonePriceList } from "@/components/ZonePriceList";
 import { Card } from "@/components/ui/card";
@@ -432,6 +433,8 @@ export default function SeatSelection() {
       </div>
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      
+      <Footer />
     </div>
   );
 }

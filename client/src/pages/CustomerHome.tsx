@@ -122,13 +122,11 @@ const mockCartItems = [
 
 export default function CustomerHome() {
   const [, setLocation] = useLocation();
-  const { isAuthenticated } = useAuth();
-  const { items, updateQuantity, removeItem, clearCart, itemCount } = useCart();
+  const { itemCount } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
 
   const handleCheckout = () => {
-    console.log("Proceeding to checkout with items:", items);
     setLocation('/checkout');
     setCartOpen(false);
   };
@@ -177,11 +175,7 @@ export default function CustomerHome() {
 
       <CartSidebar
         isOpen={cartOpen}
-        items={isAuthenticated ? items : []}
         onClose={() => setCartOpen(false)}
-        onQuantityChange={updateQuantity}
-        onRemove={removeItem}
-        onClearCart={clearCart}
         onCheckout={handleCheckout}
         onLoginClick={() => setAuthOpen(true)}
       />

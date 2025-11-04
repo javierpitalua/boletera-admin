@@ -4,6 +4,7 @@ import { ChevronLeft, Calendar, MapPin, ShoppingCart, Minus, Plus, Ticket, Alert
 import { Button } from "@/components/ui/button";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { AuthDialog } from "@/components/AuthDialog";
+import { CartSidebar } from "@/components/CartSidebar";
 import { Footer } from "@/components/Footer";
 import { VenueZoneMap } from "@/components/VenueZoneMap";
 import { ZonePriceList } from "@/components/ZonePriceList";
@@ -144,6 +145,7 @@ export default function SeatSelection() {
   const { addItem, itemCount } = useCart();
   const { toast } = useToast();
   const [authOpen, setAuthOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const [zoneTickets, setZoneTickets] = useState<{ [key: string]: number }>({});
   const [additionalItems, setAdditionalItems] = useState<{ [key: string]: number }>({});
   const [showLoginWarning, setShowLoginWarning] = useState(false);
@@ -261,6 +263,7 @@ export default function SeatSelection() {
     <div className="min-h-screen bg-background">
       <CustomerHeader
         cartItemCount={itemCount}
+        onCartClick={() => setCartOpen(true)}
         onUserClick={() => setAuthOpen(true)}
       />
 
@@ -473,6 +476,13 @@ export default function SeatSelection() {
           </div>
         </div>
       </div>
+
+      <CartSidebar
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onCheckout={() => setLocation('/checkout')}
+        onLoginClick={() => setAuthOpen(true)}
+      />
 
       <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
       

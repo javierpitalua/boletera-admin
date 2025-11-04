@@ -9,40 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface CartItemData {
-  id: string;
-  eventName: string;
-  zoneName: string;
-  price: number;
-  quantity: number;
-  image?: string;
-  type?: 'ticket' | 'item';
-  itemName?: string;
-}
+import { useCart } from "@/contexts/CartContext";
 
 interface CartSidebarProps {
   isOpen: boolean;
-  items: CartItemData[];
   onClose: () => void;
-  onQuantityChange?: (id: string, quantity: number) => void;
-  onRemove?: (id: string) => void;
   onCheckout?: () => void;
-  onClearCart?: () => void;
   onLoginClick?: () => void;
 }
 
 export function CartSidebar({
   isOpen,
-  items,
   onClose,
-  onQuantityChange,
-  onRemove,
   onCheckout,
-  onClearCart,
   onLoginClick,
 }: CartSidebarProps) {
   const { isAuthenticated } = useAuth();
+  const { items, updateQuantity, removeItem, clearCart } = useCart();
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
@@ -111,12 +94,10 @@ export function CartSidebar({
   };
 
   const handleClearCart = () => {
-    if (onClearCart) {
-      onClearCart();
-      setAppliedCoupon(null);
-      setCouponCode("");
-      setCouponError("");
-    }
+    clearCart();
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
   };
 
   if (!isOpen) return null;
@@ -217,8 +198,8 @@ export function CartSidebar({
                         <CartItem
                           key={item.id}
                           {...item}
-                          onQuantityChange={onQuantityChange}
-                          onRemove={onRemove}
+                          onQuantityChange={updateQuantity}
+                          onRemove={removeItem}
                         />
                       ))}
                     </div>
@@ -236,8 +217,8 @@ export function CartSidebar({
                           <CartItem
                             key={item.id}
                             {...item}
-                            onQuantityChange={onQuantityChange}
-                            onRemove={onRemove}
+                            onQuantityChange={updateQuantity}
+                            onRemove={removeItem}
                           />
                         ))}
                       </div>

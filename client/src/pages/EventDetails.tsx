@@ -319,7 +319,6 @@ export default function EventDetails() {
 
       <CartSidebar
         isOpen={cartOpen}
-        items={isAuthenticated ? [] : []}
         onClose={() => setCartOpen(false)}
         onCheckout={() => setLocation('/checkout')}
         onLoginClick={() => setAuthOpen(true)}

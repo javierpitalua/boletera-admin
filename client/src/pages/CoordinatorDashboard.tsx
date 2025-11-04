@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Plus, Calendar, Ticket, MapPin, Tag, LogOut, List, Settings } from "lucide-react";
+import { Plus, Calendar, Ticket, MapPin, Tag, LogOut, List, Settings, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventForm } from "@/components/coordinator/EventForm";
+import { ReserveTickets } from "@/components/coordinator/ReserveTickets";
 import { Badge } from "@/components/ui/badge";
 
 export default function CoordinatorDashboard() {
   const [, setLocation] = useLocation();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
+  const [activeView, setActiveView] = useState<"events" | "reserve">("events");
   
   // Datos mock de eventos
   const [events, setEvents] = useState([
@@ -91,16 +93,41 @@ export default function CoordinatorDashboard() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Sidebar - Lista de Eventos */}
+          {/* Sidebar - Navegación */}
           <div className="lg:col-span-1 space-y-4">
+            {/* Navegación Principal */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Mis Eventos</CardTitle>
-                <CardDescription>
-                  {events.length} evento{events.length !== 1 ? 's' : ''} registrado{events.length !== 1 ? 's' : ''}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="p-3 space-y-1">
+                <Button
+                  variant={activeView === "events" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveView("events")}
+                  data-testid="button-nav-events"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Gestionar Eventos
+                </Button>
+                <Button
+                  variant={activeView === "reserve" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveView("reserve")}
+                  data-testid="button-nav-reserve"
+                >
+                  <BookmarkCheck className="h-4 w-4 mr-2" />
+                  Apartar Boletos
+                </Button>
+              </CardContent>
+            </Card>
+
+            {activeView === "events" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Mis Eventos</CardTitle>
+                  <CardDescription>
+                    {events.length} evento{events.length !== 1 ? 's' : ''} registrado{events.length !== 1 ? 's' : ''}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
                 <Button
                   className="w-full"
                   onClick={handleCreateEvent}
@@ -154,61 +181,70 @@ export default function CoordinatorDashboard() {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Estadísticas Rápidas */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Estadísticas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Total Actividades</span>
-                  <span className="font-semibold">13</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Total Zonas</span>
-                  <span className="font-semibold">7</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Cupones Activos</span>
-                  <span className="font-semibold text-chart-2">4</span>
-                </div>
-              </CardContent>
-            </Card>
+            {activeView === "events" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Estadísticas</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Total Actividades</span>
+                    <span className="font-semibold">13</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Total Zonas</span>
+                    <span className="font-semibold">7</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Cupones Activos</span>
+                    <span className="font-semibold text-chart-2">4</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Área Principal */}
           <div className="lg:col-span-3">
-            {!isCreatingEvent && !selectedEventId ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-16">
-                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Calendar className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h2 className="text-xl font-semibold mb-2">
-                    Bienvenido al Panel de Coordinador
-                  </h2>
-                  <p className="text-muted-foreground text-center max-w-md mb-6">
-                    Selecciona un evento de la lista o crea uno nuevo para comenzar a gestionar actividades, zonas y cupones
-                  </p>
-                  <Button onClick={handleCreateEvent}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Crear Primer Evento
-                  </Button>
-                </CardContent>
-              </Card>
+            {activeView === "reserve" ? (
+              <ReserveTickets />
             ) : (
-              <EventForm
-                eventId={selectedEventId}
-                onClose={handleCloseForm}
-                onSave={(eventData: any) => {
-                  console.log("Saving event:", eventData);
-                  handleCloseForm();
-                }}
-              />
+              <>
+                {!isCreatingEvent && !selectedEventId ? (
+                  <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-16">
+                      <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                        <Calendar className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <h2 className="text-xl font-semibold mb-2">
+                        Bienvenido al Panel de Coordinador
+                      </h2>
+                      <p className="text-muted-foreground text-center max-w-md mb-6">
+                        Selecciona un evento de la lista o crea uno nuevo para comenzar a gestionar actividades, zonas y cupones
+                      </p>
+                      <Button onClick={handleCreateEvent}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Crear Primer Evento
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <EventForm
+                    eventId={selectedEventId}
+                    onClose={handleCloseForm}
+                    onSave={(eventData: any) => {
+                      console.log("Saving event:", eventData);
+                      handleCloseForm();
+                    }}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>

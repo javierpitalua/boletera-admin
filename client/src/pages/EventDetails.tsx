@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { ChevronLeft, Calendar, MapPin, Users } from "lucide-react";
+import { ChevronLeft, Calendar, MapPin, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomerHeader } from "@/components/CustomerHeader";
@@ -9,6 +9,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { AuthDialog } from "@/components/AuthDialog";
 import { EventPerformanceList } from "@/components/EventPerformanceList";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c247a60.png";
 
 // todo: remove mock functionality
@@ -91,10 +93,12 @@ const mockPerformances = [
 export default function EventDetails() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [selectedZone, setSelectedZone] = useState<string>();
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
+  const [showLoginWarning, setShowLoginWarning] = useState(false);
 
   const handleFindTickets = (performanceId: string) => {
     setLocation(`/event/${id}/seats/${performanceId}`);
@@ -102,6 +106,26 @@ export default function EventDetails() {
 
   const handleBack = () => {
     setLocation("/");
+  };
+
+  const handleProductQuantityChange = (productId: string, quantity: number) => {
+    if (!isAuthenticated && quantity > 0) {
+      setShowLoginWarning(true);
+      setAuthOpen(true);
+      return;
+    }
+    
+    setProductQuantities({ ...productQuantities, [productId]: quantity });
+  };
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      setShowLoginWarning(true);
+      setAuthOpen(true);
+      return;
+    }
+    
+    console.log("Adding to cart:", selectedZone);
   };
 
   return (
@@ -152,6 +176,16 @@ export default function EventDetails() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Mensaje de advertencia cuando no está logueado */}
+        {!isAuthenticated && showLoginWarning && (
+          <Alert className="mb-6" data-testid="alert-login-required">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Debes iniciar sesión para continuar con la compra
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Tabs defaultValue="performances" className="space-y-6">
           <TabsList>
             <TabsTrigger value="performances" data-testid="tab-performances">
@@ -208,9 +242,7 @@ export default function EventDetails() {
                     key={product.id}
                     {...product}
                     quantity={productQuantities[product.id] || 0}
-                    onQuantityChange={(id, qty) =>
-                      setProductQuantities({ ...productQuantities, [id]: qty })
-                    }
+                    onQuantityChange={handleProductQuantityChange}
                   />
                 ))}
               </div>
@@ -228,7 +260,12 @@ export default function EventDetails() {
                   : "Ninguna"}
               </p>
             </div>
-            <Button size="lg" disabled={!selectedZone} data-testid="button-add-to-cart">
+            <Button 
+              size="lg" 
+              disabled={!selectedZone} 
+              onClick={handleAddToCart}
+              data-testid="button-add-to-cart"
+            >
               Agregar al Carrito
             </Button>
           </div>

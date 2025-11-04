@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ type AuthView = "login" | "register" | "forgot";
 
 export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
   const [, setLocation] = useLocation();
+  const { login, register } = useAuth();
+  const { toast } = useToast();
   const [view, setView] = useState<AuthView>("login");
   const [isCoordinator, setIsCoordinator] = useState(false);
   const [formData, setFormData] = useState({
@@ -33,14 +37,62 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Auth submit:", view, formData, "isCoordinator:", isCoordinator);
     
-    // Simular login - si es coordinador, redirigir al dashboard de coordinador
-    if (view === "login" && isCoordinator) {
-      setLocation('/coordinator');
+    if (view === "login") {
+      if (!formData.email || !formData.password) {
+        toast({
+          title: "Error",
+          description: "Por favor completa todos los campos",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const role = isCoordinator ? "coordinator" : "customer";
+      login(formData.email, formData.password, role);
+      
+      toast({
+        title: "¡Bienvenido!",
+        description: `Has iniciado sesión como ${isCoordinator ? 'coordinador' : 'cliente'}`,
+      });
+      
+      if (isCoordinator) {
+        setLocation('/coordinator');
+      }
       onClose();
-    } else {
+    } else if (view === "register") {
+      if (!formData.email || !formData.password || !formData.fullName) {
+        toast({
+          title: "Error",
+          description: "Por favor completa todos los campos obligatorios",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Las contraseñas no coinciden",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      register(formData.email, formData.password, formData.fullName);
+      
+      toast({
+        title: "¡Cuenta creada!",
+        description: "Tu cuenta ha sido creada exitosamente",
+      });
+      
       onClose();
+    } else if (view === "forgot") {
+      toast({
+        title: "Correo enviado",
+        description: "Revisa tu bandeja de entrada para recuperar tu contraseña",
+      });
+      handleViewChange("login");
     }
   };
 

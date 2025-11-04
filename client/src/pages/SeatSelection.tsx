@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { ChevronLeft, Calendar, MapPin, ShoppingCart, Minus, Plus, Ticket } from "lucide-react";
+import { ChevronLeft, Calendar, MapPin, ShoppingCart, Minus, Plus, Ticket, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomerHeader } from "@/components/CustomerHeader";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -9,6 +9,8 @@ import { ZonePriceList } from "@/components/ZonePriceList";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // todo: remove mock functionality
 const mockZones = [
@@ -135,15 +137,23 @@ const mockAdditionalItems = [
 export default function SeatSelection() {
   const { eventId } = useParams();
   const [, setLocation] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [zoneTickets, setZoneTickets] = useState<{ [key: string]: number }>({});
   const [additionalItems, setAdditionalItems] = useState<{ [key: string]: number }>({});
+  const [showLoginWarning, setShowLoginWarning] = useState(false);
   
   const MAX_TICKETS = 8;
 
   const totalTickets = Object.values(zoneTickets).reduce((sum, count) => sum + count, 0);
 
   const handleTicketChange = (zoneId: string, quantity: number) => {
+    if (!isAuthenticated && quantity > 0) {
+      setShowLoginWarning(true);
+      setAuthOpen(true);
+      return;
+    }
+    
     setZoneTickets(prev => {
       const newTickets = { ...prev };
       if (quantity === 0) {
@@ -156,6 +166,12 @@ export default function SeatSelection() {
   };
 
   const handleItemChange = (itemId: string, change: number) => {
+    if (!isAuthenticated && change > 0) {
+      setShowLoginWarning(true);
+      setAuthOpen(true);
+      return;
+    }
+    
     setAdditionalItems(prev => {
       const current = prev[itemId] || 0;
       const newValue = Math.max(0, current + change);
@@ -228,6 +244,16 @@ export default function SeatSelection() {
             </div>
           </div>
         </div>
+
+        {/* Mensaje de advertencia cuando no está logueado */}
+        {!isAuthenticated && showLoginWarning && (
+          <Alert className="mb-6" data-testid="alert-login-required">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Debes iniciar sesión para continuar con la compra
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

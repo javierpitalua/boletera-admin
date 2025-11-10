@@ -4,14 +4,14 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: "customer" | "coordinator";
+  role: "coordinator";
+  token: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string, role: "customer" | "coordinator") => void;
-  register: (email: string, password: string, name: string) => void;
+  login: (email: string, password: string, token: string) => void;
   logout: () => void;
 }
 
@@ -19,31 +19,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    // Intentar recuperar sesión del localStorage
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (email: string, password: string, role: "customer" | "coordinator") => {
-    // Simulación de login - en producción esto sería una llamada al backend
+  const login = (email: string, password: string, token: string) => {
     const newUser: User = {
       id: Math.random().toString(36).substr(2, 9),
       email,
       name: email.split("@")[0],
-      role,
-    };
-    
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
-  };
-
-  const register = (email: string, password: string, name: string) => {
-    // Simulación de registro - en producción esto sería una llamada al backend
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      name,
-      role: "customer",
+      role: "coordinator",
+      token,
     };
     
     setUser(newUser);
@@ -61,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         login,
-        register,
         logout,
       }}
     >

@@ -6,10 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventForm } from "@/components/coordinator/EventForm";
 import { ReserveTickets } from "@/components/coordinator/ReserveTickets";
+import { StatsCards } from "@/components/coordinator/StatsCards";
+import { CoordinatorFooter } from "@/components/coordinator/CoordinatorFooter";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CoordinatorDashboard() {
   const [, setLocation] = useLocation();
+  const { logout } = useAuth();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [activeView, setActiveView] = useState<"events" | "reserve">("events");
@@ -41,7 +45,8 @@ export default function CoordinatorDashboard() {
   ]);
 
   const handleLogout = () => {
-    setLocation('/');
+    logout();
+    setLocation('/login');
   };
 
   const handleCreateEvent = () => {
@@ -60,7 +65,7 @@ export default function CoordinatorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -91,7 +96,13 @@ export default function CoordinatorDashboard() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-1">
+        {/* Stats Cards */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Resumen General</h2>
+          <StatsCards />
+        </div>
+
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Sidebar - Navegación */}
           <div className="lg:col-span-1 space-y-4">
@@ -249,6 +260,8 @@ export default function CoordinatorDashboard() {
           </div>
         </div>
       </div>
+
+      <CoordinatorFooter />
     </div>
   );
 }

@@ -24,15 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = (email: string, password: string, token: string) => {
-    const validTokens = [
-      "COORD2024",
-      "ADMIN2024", 
-      "EVENTO2024",
-      "TOKEN123456",
-    ];
-    
-    if (!token || !validTokens.includes(token)) {
-      throw new Error("Token inválido. Por favor verifica tu token de coordinador.");
+    if (!token) {
+      throw new Error("Por favor ingresa un token de acceso.");
     }
     
     const newUser: User = {

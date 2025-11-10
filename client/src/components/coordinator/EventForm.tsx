@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Save, X, Calendar, MapPin, List, DollarSign, Tag, Plus } from "lucide-react";
+import { useLocation } from "wouter";
+import { Save, X, Calendar, MapPin, List, DollarSign, Tag, Plus, Eye, Send, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { ActivitiesTab } from "./ActivitiesTab";
 import { VenueTab } from "./VenueTab";
 import { PricingTab } from "./PricingTab";
@@ -20,7 +22,10 @@ interface EventFormProps {
 }
 
 export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("basic");
+  const [eventStatus, setEventStatus] = useState<"draft" | "review" | "published">(eventId ? "draft" : "draft");
   
   // Estado del evento
   const [eventData, setEventData] = useState({
@@ -136,8 +141,53 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
       pricing,
       addons,
       coupons,
+      status: eventStatus,
     };
     onSave(fullEventData);
+  };
+
+  const handleVisualize = () => {
+    if (!isFormValid) {
+      toast({
+        title: "Error",
+        description: "Completa la información básica antes de visualizar",
+        variant: "destructive",
+      });
+      return;
+    }
+    setLocation(`/preview/${eventId || 'new'}`);
+  };
+
+  const handlePublish = () => {
+    if (!isFormValid) {
+      toast({
+        title: "Error",
+        description: "Completa la información básica antes de publicar",
+        variant: "destructive",
+      });
+      return;
+    }
+    setEventStatus("published");
+    toast({
+      title: "Evento Publicado",
+      description: "El evento ha sido publicado correctamente",
+    });
+  };
+
+  const handleSendToReview = () => {
+    if (!isFormValid) {
+      toast({
+        title: "Error",
+        description: "Completa la información básica antes de enviar a revisión",
+        variant: "destructive",
+      });
+      return;
+    }
+    setEventStatus("review");
+    toast({
+      title: "Enviado a Revisión",
+      description: "El evento ha sido enviado a revisión",
+    });
   };
 
   const isFormValid = eventData.name && eventData.startDate && eventData.endDate;
@@ -145,23 +195,57 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl">
-              {eventId ? "Editar Evento" : "Nuevo Evento"}
-            </CardTitle>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-2xl">
+                {eventId ? "Editar Evento" : "Nuevo Evento"}
+              </CardTitle>
+              {eventStatus !== "draft" && (
+                <Badge variant={eventStatus === "published" ? "default" : "outline"}>
+                  {eventStatus === "published" ? "Publicado" : "En Revisión"}
+                </Badge>
+              )}
+            </div>
             <CardDescription>
               {eventId ? "Modifica la información del evento" : "Completa la información del nuevo evento"}
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap justify-end">
             <Button variant="outline" onClick={onClose} data-testid="button-cancel-event">
               <X className="h-4 w-4 mr-2" />
               Cancelar
             </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleVisualize} 
+              disabled={!isFormValid}
+              data-testid="button-visualize-event"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Visualizar
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleSendToReview}
+              disabled={!isFormValid || eventStatus === "review" || eventStatus === "published"}
+              data-testid="button-send-review-event"
+            >
+              <FileCheck className="h-4 w-4 mr-2" />
+              A Revisión
+            </Button>
+            <Button 
+              variant="default" 
+              onClick={handlePublish}
+              disabled={!isFormValid || eventStatus === "published"}
+              data-testid="button-publish-event"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Publicar
+            </Button>
             <Button onClick={handleSave} disabled={!isFormValid} data-testid="button-save-event">
               <Save className="h-4 w-4 mr-2" />
-              Guardar Evento
+              Guardar
             </Button>
           </div>
         </div>

@@ -40,15 +40,23 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
       return;
     }
     
-    login(formData.email, formData.password, formData.token);
-    
-    toast({
-      title: "¡Bienvenido!",
-      description: "Has iniciado sesión como coordinador",
-    });
-    
-    setLocation('/coordinator');
-    onClose();
+    try {
+      login(formData.email, formData.password, formData.token);
+      
+      toast({
+        title: "¡Bienvenido!",
+        description: "Has iniciado sesión como coordinador",
+      });
+      
+      setLocation('/coordinator');
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error de autenticación",
+        description: error instanceof Error ? error.message : "Token inválido",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetForm = () => {

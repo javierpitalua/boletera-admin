@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Calendar, MapPin, DollarSign, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,59 +7,91 @@ import concertImage from "@assets/generated_images/Concert_crowd_hero_image_7c24
 
 export default function EventPreview() {
   const [, setLocation] = useLocation();
+  const params = useParams();
+  const eventId = params.id;
 
-  const mockEvent = {
-    id: "preview",
-    name: "Festival de Rock en Vivo 2024",
-    description: "El festival de rock más esperado del año con las mejores bandas nacionales e internacionales. Disfruta de tres días inolvidables llenos de música, entretenimiento y las mejores experiencias.",
-    startDate: "2024-11-15",
-    endDate: "2024-11-17",
-    venue: "Estadio Nacional",
-    city: "Ciudad de México",
-    capacity: 50000,
-    image: concertImage,
-    category: "Festival",
-    priceFrom: 850,
-    activities: [
-      {
-        id: "act-1",
-        name: "Concierto Apertura",
-        location: "Escenario Principal",
-        date: "2024-11-15",
-        startTime: "20:00",
-      },
-      {
-        id: "act-2",
-        name: "Banda Headliner",
-        location: "Escenario Principal",
-        date: "2024-11-16",
-        startTime: "22:00",
-      },
-    ],
-    zones: [
-      {
-        id: "zone-1",
-        name: "VIP",
-        description: "Zona exclusiva con acceso a barras premium",
-        capacity: 200,
-        price: 2500,
-      },
-      {
-        id: "zone-2",
-        name: "Preferente A",
-        description: "Vista frontal al escenario",
-        capacity: 500,
-        price: 1800,
-      },
-      {
-        id: "zone-3",
-        name: "General",
-        description: "Acceso general al evento",
-        capacity: 2000,
-        price: 850,
-      },
-    ],
+  const getEventData = () => {
+    const savedData = sessionStorage.getItem('eventPreviewData');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      return {
+        id: eventId || "preview",
+        name: data.name || "Evento Sin Nombre",
+        description: data.description || "Sin descripción disponible",
+        startDate: data.startDate || new Date().toISOString().split('T')[0],
+        endDate: data.endDate || new Date().toISOString().split('T')[0],
+        venue: "Estadio Nacional",
+        city: "Ciudad de México",
+        capacity: 50000,
+        image: concertImage,
+        category: "Festival",
+        priceFrom: data.zones?.[0]?.price || 850,
+        activities: data.activities || [],
+        zones: data.zones?.map((z: any) => ({
+          id: z.id,
+          name: z.name,
+          description: z.description,
+          capacity: z.capacity,
+          price: 850,
+        })) || [],
+      };
+    }
+    
+    return {
+      id: eventId || "preview",
+      name: "Festival de Rock en Vivo 2024",
+      description: "El festival de rock más esperado del año con las mejores bandas nacionales e internacionales. Disfruta de tres días inolvidables llenos de música, entretenimiento y las mejores experiencias.",
+      startDate: "2024-11-15",
+      endDate: "2024-11-17",
+      venue: "Estadio Nacional",
+      city: "Ciudad de México",
+      capacity: 50000,
+      image: concertImage,
+      category: "Festival",
+      priceFrom: 850,
+      activities: [
+        {
+          id: "act-1",
+          name: "Concierto Apertura",
+          location: "Escenario Principal",
+          date: "2024-11-15",
+          startTime: "20:00",
+        },
+        {
+          id: "act-2",
+          name: "Banda Headliner",
+          location: "Escenario Principal",
+          date: "2024-11-16",
+          startTime: "22:00",
+        },
+      ],
+      zones: [
+        {
+          id: "zone-1",
+          name: "VIP",
+          description: "Zona exclusiva con acceso a barras premium",
+          capacity: 200,
+          price: 2500,
+        },
+        {
+          id: "zone-2",
+          name: "Preferente A",
+          description: "Vista frontal al escenario",
+          capacity: 500,
+          price: 1800,
+        },
+        {
+          id: "zone-3",
+          name: "General",
+          description: "Acceso general al evento",
+          capacity: 2000,
+          price: 850,
+        },
+      ],
+    };
   };
+
+  const mockEvent = getEventData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,7 +168,7 @@ export default function EventPreview() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mockEvent.activities.map((activity) => (
+                {mockEvent.activities.map((activity: any) => (
                   <div
                     key={activity.id}
                     className="p-4 border rounded-lg hover-elevate"
@@ -177,7 +209,7 @@ export default function EventPreview() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid sm:grid-cols-2 gap-4">
-                {mockEvent.zones.map((zone) => (
+                {mockEvent.zones.map((zone: any) => (
                   <Card
                     key={zone.id}
                     className="hover-elevate"

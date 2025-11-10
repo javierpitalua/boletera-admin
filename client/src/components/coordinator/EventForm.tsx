@@ -54,12 +54,19 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
   ] : []);
 
   // Zonas mock
-  const [zones, setZones] = useState(eventId ? [
+  const [zones, setZones] = useState<Array<{
+    id: string;
+    name: string;
+    description: string;
+    type: "seated" | "tables" | "general";
+    capacity: number;
+    color: string;
+  }>>(eventId ? [
     {
       id: "zone-1",
       name: "VIP",
       description: "Zona exclusiva con acceso a barras premium",
-      type: "seated" as const,
+      type: "seated" as "seated" | "tables" | "general",
       capacity: 200,
       color: "#9333ea",
     },
@@ -67,7 +74,7 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
       id: "zone-2",
       name: "Preferente A",
       description: "Vista frontal al escenario",
-      type: "seated" as const,
+      type: "seated" as "seated" | "tables" | "general",
       capacity: 500,
       color: "#3b82f6",
     },
@@ -108,28 +115,38 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
   ] : []);
 
   // Cupones mock
-  const [coupons, setCoupons] = useState(eventId ? [
+  const [coupons, setCoupons] = useState<Array<{
+    id: string;
+    code: string;
+    type: "percentage" | "fixed";
+    value: number;
+    expiryDate: string;
+    usageLimit: number;
+    usageCount: number;
+    activityId: string;
+    status: "active" | "inactive";
+  }>>(eventId ? [
     {
       id: "coupon-1",
       code: "DESCUENTO15",
-      type: "percentage" as const,
+      type: "percentage" as "percentage" | "fixed",
       value: 15,
       expiryDate: "2024-11-10",
       usageLimit: 100,
       usageCount: 45,
       activityId: "act-1",
-      status: "active" as const,
+      status: "active" as "active" | "inactive",
     },
     {
       id: "coupon-2",
       code: "VERANO100",
-      type: "fixed" as const,
+      type: "fixed" as "percentage" | "fixed",
       value: 100,
       expiryDate: "2024-11-15",
       usageLimit: 50,
       usageCount: 50,
       activityId: "act-2",
-      status: "inactive" as const,
+      status: "inactive" as "active" | "inactive",
     },
   ] : []);
 
@@ -155,6 +172,16 @@ export function EventForm({ eventId, onClose, onSave }: EventFormProps) {
       });
       return;
     }
+    
+    const previewData = {
+      ...eventData,
+      activities,
+      zones,
+      pricing,
+      addons,
+      coupons,
+    };
+    sessionStorage.setItem('eventPreviewData', JSON.stringify(previewData));
     setLocation(`/preview/${eventId || 'new'}`);
   };
 
